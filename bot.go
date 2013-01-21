@@ -20,9 +20,11 @@ type Bot struct {
 }
 
 func NewBot() *Bot {
+
+		//server:  "irc.ozinger.org",
 	return &Bot{
-		server:  "irc.ozinger.org",
-		port:    "6667",
+		server: "kanade.irc.ozinger.org",
+		port:    "6668",
 		nick:    "gdgandbot",
 		channel: "gdgand",
 		pass:    "",
@@ -44,9 +46,10 @@ func (bot *Bot) Connect() (conn net.Conn, err error) {
 func main() {
 	ircbot := NewBot()
 	conn, _ := ircbot.Connect()
-	fmt.Fprintf(conn, "USER %s 8 * :%s\n", ircbot.nick, ircbot.nick)
-	conn.Write([]byte("NICK " + ircbot.nick))
-	conn.Write([]byte("JOIN " + ircbot.channel))
+	//	fmt.Fprintf(conn, "USER %s 8 * :%s\n", ircbot.nick, ircbot.nick)
+	fmt.Fprintf(conn, "USER bot 0 * :fishing\n")
+	conn.Write([]byte("NICK " + ircbot.nick + "\n"))
+	conn.Write([]byte("JOIN " + ircbot.channel + "\n"))
 	defer conn.Close()
 
 	reader := bufio.NewReader(conn)
