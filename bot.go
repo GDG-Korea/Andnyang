@@ -48,8 +48,6 @@ func main() {
 	ircbot := NewBot()
 	conn, _ := ircbot.Connect()
 	defer conn.Close()
-	//fmt.Fprintf(conn, "USER %s 8 * :%s\n", ircbot.nick, ircbot.nick)
-	//conn.Write([]byte("NICK " + ircbot.nick + "\r\n"))
 
 	reader := bufio.NewReader(conn)
 	tpReader := textproto.NewReader(reader)
