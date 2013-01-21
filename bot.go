@@ -25,7 +25,7 @@ func NewBot() *Bot {
 	return &Bot{
 		server:  "kanade.irc.ozinger.org",
 		port:    "6668",
-		nick:    "gdgandbot",
+		nick:    "안드봇",
 		channel: "#gdgand",
 		pass:    "",
 		conn:    nil,
@@ -53,7 +53,7 @@ func main() {
 	writer := bufio.NewWriter(conn)
 	tpWriter := textproto.NewWriter(writer)
 
-	userCommand := fmt.Sprintf("USER %s 8 * :%s\n", ircbot.nick, ircbot.nick)
+	userCommand := fmt.Sprintf("USER %s 8 * :%s\n", ircbot.user, ircbot.user)
 	tpWriter.PrintfLine(userCommand)
 	tpWriter.PrintfLine("NICK " + ircbot.nick)
 
