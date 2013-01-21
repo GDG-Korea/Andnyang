@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"net/textproto"
+	"strings"
 )
 
 type Bot struct {
@@ -21,12 +22,12 @@ type Bot struct {
 
 func NewBot() *Bot {
 
-		//server:  "irc.ozinger.org",
+	//server:  "irc.ozinger.org",
 	return &Bot{
-		server: "kanade.irc.ozinger.org",
+		server:  "kanade.irc.ozinger.org",
 		port:    "6668",
 		nick:    "gdgandbot",
-		channel: "gdgand",
+		channel: "#gdgand",
 		pass:    "",
 		conn:    nil,
 		user:    "gdgand",
@@ -46,20 +47,39 @@ func (bot *Bot) Connect() (conn net.Conn, err error) {
 func main() {
 	ircbot := NewBot()
 	conn, _ := ircbot.Connect()
-	//	fmt.Fprintf(conn, "USER %s 8 * :%s\n", ircbot.nick, ircbot.nick)
-	fmt.Fprintf(conn, "USER bot 0 * :fishing\n")
-	conn.Write([]byte("NICK " + ircbot.nick + "\n"))
-	conn.Write([]byte("JOIN " + ircbot.channel + "\n"))
 	defer conn.Close()
+	//fmt.Fprintf(conn, "USER %s 8 * :%s\n", ircbot.nick, ircbot.nick)
+	//conn.Write([]byte("NICK " + ircbot.nick + "\r\n"))
 
 	reader := bufio.NewReader(conn)
-	tp := textproto.NewReader(reader)
+	tpReader := textproto.NewReader(reader)
+	writer := bufio.NewWriter(conn)
+	tpWriter := textproto.NewWriter(writer)
+
+	userCommand := fmt.Sprintf("USER %s 8 * :%s\n", ircbot.nick, ircbot.nick)
+	tpWriter.PrintfLine(userCommand)
+	tpWriter.PrintfLine("NICK " + ircbot.nick)
 
 	for {
-		line, err := tp.ReadLine()
+		line, err := tpReader.ReadLine()
 		if err != nil {
 			break
 		}
-		fmt.Printf("%s\n", line)
+
+		arr := strings.Split(line, " ")
+		if arr[0] == "PING" {
+			token := arr[1]
+			request := fmt.Sprintf("PONG %s", token)
+			tpWriter.PrintfLine(request)
+		} else if arr[0][0] == ':' && arr[1] == "001" {
+			request := fmt.Sprintf("JOIN %s", ircbot.channel)
+			tpWriter.PrintfLine(request)
+		} else if arr[0][0] == ':' && arr[1] == "PRIVMSG" && arr[2] == ircbot.channel && arr[3][1] == '!' {
+			fmt.Printf(">>> %s\n", line)
+			request := fmt.Sprintf("PRIVMSG %s :%s", ircbot.channel, arr[3][2:])
+			tpWriter.PrintfLine(request)
+		} else {
+			fmt.Printf(">>> %s\n", line)
+		}
 	}
 }
