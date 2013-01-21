@@ -16,7 +16,6 @@ type Bot struct {
 	user          string
 	channel       string
 	pass          string
-	pread, pwrite chan string
 	conn          net.Conn
 }
 
