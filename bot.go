@@ -6,17 +6,16 @@ import (
 	"log"
 	"net"
 	"net/textproto"
-	"strings"
 )
 
 type Bot struct {
-	server        string
-	port          string
-	nick          string
-	user          string
-	channel       string
-	pass          string
-	conn          net.Conn
+	server  string
+	port    string
+	nick    string
+	user    string
+	channel string
+	pass    string
+	conn    net.Conn
 }
 
 func NewBot() *Bot {
@@ -43,6 +42,32 @@ func (bot *Bot) Connect() (conn net.Conn, err error) {
 	return bot.conn, nil
 }
 
+func ParseLine(line string) []string {
+	output := make([]string, 4)
+	oi := 0
+	n := 0
+	space := false
+
+	for i, c := range line {
+		if oi == 3 {
+			continue
+		} else if space == false && c == ' ' && n < i {
+			output[oi] = line[n:i]
+			space = true
+			n = i + 1
+			oi++
+		} else if space == true && c == ' ' {
+			n = i + 1
+			continue
+		} else if space == true && c != ' ' {
+			space = false
+		}
+	}
+
+	output[oi] = line[n:]
+	return output
+}
+
 func main() {
 	ircbot := NewBot()
 	conn, _ := ircbot.Connect()
@@ -63,7 +88,8 @@ func main() {
 			break
 		}
 
-		arr := strings.Split(line, " ")
+		arr := ParseLine(line)
+
 		if arr[0] == "PING" {
 			token := arr[1]
 			request := fmt.Sprintf("PONG %s", token)
