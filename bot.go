@@ -45,6 +45,9 @@ func (bot *Bot) Connect() (conn net.Conn, err error) {
 	bot.writer = bufio.NewWriter(bot.conn)
 	bot.tpWriter = textproto.NewWriter(bot.writer)
 
+	userCommand := fmt.Sprintf("USER %s 8 * :%s\n", bot.user, bot.user)
+	bot.tpWriter.PrintfLine(userCommand)
+	bot.tpWriter.PrintfLine("NICK " + bot.nick)
 	return bot.conn, nil
 }
 
@@ -69,12 +72,7 @@ func main() {
 	ircbot := NewBot()
 	conn, _ := ircbot.Connect()
 	defer conn.Close()
-
 	channel := ircbot.NewChannel("#gdgand")
-
-	userCommand := fmt.Sprintf("USER %s 8 * :%s\n", ircbot.user, ircbot.user)
-	ircbot.tpWriter.PrintfLine(userCommand)
-	ircbot.tpWriter.PrintfLine("NICK " + ircbot.nick)
 
 	for {
 		line, err := ircbot.tpReader.ReadLine()
