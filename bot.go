@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"net/textproto"
+	"strings"
 )
 
 type Bot struct {
@@ -24,7 +25,7 @@ func NewBot() *Bot {
 	return &Bot{
 		server:  "kanade.irc.ozinger.org",
 		port:    "6668",
-		nick:    "안드봇",
+		nick:    "안드냥",
 		channel: "#gdgand",
 		pass:    "",
 		conn:    nil,
@@ -100,6 +101,20 @@ func main() {
 		} else if arr[0][0] == ':' && arr[1] == "PRIVMSG" && arr[2] == ircbot.channel && arr[3][1] == '!' {
 			fmt.Printf(">>> %s\n", line)
 			request := fmt.Sprintf("PRIVMSG %s :%s", ircbot.channel, arr[3][2:])
+			tpWriter.PrintfLine(request)
+		} else if arr[0][0] == ':' && arr[1] == "JOIN" && arr[2][1:] == ircbot.channel {
+			fmt.Printf(">>> %s\n", line)
+			nameLine := arr[0][1:]
+			nameArr := strings.Split(nameLine, "!")
+			name := nameArr[0]
+			var request string
+			if name == ircbot.nick {
+				request = fmt.Sprintf("PRIVMSG %s :오랜만이에요. :) 모두 안녕하세요.", ircbot.channel)
+			} else {
+				request = fmt.Sprintf("PRIVMSG %s :안녕하세요. %s님 ^^", ircbot.channel, name)
+			}
+			tpWriter.PrintfLine(request)
+			request = fmt.Sprintf("MODE %s +o %s", ircbot.channel, name)
 			tpWriter.PrintfLine(request)
 		} else {
 			fmt.Printf(">>> %s\n", line)
