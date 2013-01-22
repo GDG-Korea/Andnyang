@@ -33,12 +33,13 @@ func NewBot() *Bot {
 	}
 }
 
-func (bot *Bot) Connect() (conn net.Conn, err error) {
-	conn, err = net.Dial("tcp", bot.server+":"+bot.port)
+func (bot *Bot) Connect() {
+	conn, err := net.Dial("tcp", bot.server+":"+bot.port)
 	if err != nil {
 		log.Fatal("unable to connect to IRC server", err)
 	}
 	bot.conn = conn
+
 	log.Printf("Connected to IRC server %s(%s)\n", bot.server, bot.conn.RemoteAddr())
 	bot.reader = bufio.NewReader(bot.conn)
 	bot.tpReader = textproto.NewReader(bot.reader)
@@ -48,7 +49,10 @@ func (bot *Bot) Connect() (conn net.Conn, err error) {
 	userCommand := fmt.Sprintf("USER %s 8 * :%s\n", bot.user, bot.user)
 	bot.tpWriter.PrintfLine(userCommand)
 	bot.tpWriter.PrintfLine("NICK " + bot.nick)
-	return bot.conn, nil
+}
+
+func (bot *Bot) Close() {
+	bot.conn.Close()
 }
 
 type Channel struct {
@@ -70,8 +74,8 @@ func (c *Channel) Talk(msg string) {
 
 func main() {
 	ircbot := NewBot()
-	conn, _ := ircbot.Connect()
-	defer conn.Close()
+	ircbot.Connect()
+	defer ircbot.Close()
 	channel := ircbot.NewChannel("#gdgand")
 
 	for {
