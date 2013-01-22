@@ -69,6 +69,15 @@ func ParseLine(line string) []string {
 	return output
 }
 
+type myWriter struct {
+	*textproto.Writer
+}
+
+func (w *myWriter) Talk(channel string, msg string) {
+	text := fmt.Sprintf("PRIVMSG %s :%s", channel, msg)
+	w.Writer.PrintfLine(text)
+}
+
 func main() {
 	ircbot := NewBot()
 	conn, _ := ircbot.Connect()
@@ -100,8 +109,8 @@ func main() {
 			tpWriter.PrintfLine(request)
 		} else if arr[0][0] == ':' && arr[1] == "PRIVMSG" && arr[2] == ircbot.channel && arr[3][1] == '!' {
 			fmt.Printf(">>> %s\n", line)
-			request := fmt.Sprintf("PRIVMSG %s :%s", ircbot.channel, arr[3][2:])
-			tpWriter.PrintfLine(request)
+			m := myWriter { tpWriter }
+			m.Talk(ircbot.channel, arr[3][2:])
 		} else if arr[0][0] == ':' && arr[1] == "JOIN" && arr[2][1:] == ircbot.channel {
 			fmt.Printf(">>> %s\n", line)
 			nameLine := arr[0][1:]
