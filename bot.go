@@ -128,9 +128,9 @@ func main() {
 }
 
 func TokenizeLine(line string) []string {
-	// The line will break into four strings.
+	// Each line will break into four strings.
 	// First three strings will be splitted by whitespace,
-	// all rest characters will be the fourth string.
+	// all rest will be the fourth string.
 
 	output := make([]string, 4)
 	oi := 0
