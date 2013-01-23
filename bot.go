@@ -123,8 +123,8 @@ func main() {
 			if name == ircbot.nick {
 				channel.Talk("오랜만이에요. :) 모두 안녕하세요.")
 			} else {
-				text := fmt.Sprintf("안녕하세요. %s님 ^^", name)
-				channel.Talk(text)
+				//text := fmt.Sprintf("안녕하세요. %s님 ^^", name)
+				//channel.Talk(text)
 				channel.Op(name)
 			}
 		} else {
