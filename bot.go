@@ -49,6 +49,11 @@ func (bot *Bot) Connect() {
 	bot.tpWriter.PrintfLine("NICK " + bot.nick)
 }
 
+func (bot *Bot) Pong(token string) {
+	request := fmt.Sprintf("PONG %s", token)
+	bot.tpWriter.PrintfLine(request)
+}
+
 func (bot *Bot) Close() {
 	bot.conn.Close()
 }
@@ -70,6 +75,11 @@ func (c *Channel) Talk(msg string) {
 	c.bot.tpWriter.PrintfLine(text)
 }
 
+func (c *Channel) Op(user string) {
+	request := fmt.Sprintf("MODE %s +o %s", c.channel, user)
+	c.bot.tpWriter.PrintfLine(request)
+}
+
 func main() {
 	ircbot := NewBot()
 	ircbot.Connect()
@@ -87,8 +97,7 @@ func main() {
 		// Each line is started with ':' except 'PING' messages.
 		if arr[0] == "PING" {
 			token := arr[1]
-			request := fmt.Sprintf("PONG %s", token)
-			ircbot.tpWriter.PrintfLine(request)
+			ircbot.Pong(token)
 			continue
 		} else if arr[0][0] != ':' {
 			fmt.Printf("Something is wrong!\n")
@@ -116,9 +125,8 @@ func main() {
 			} else {
 				text := fmt.Sprintf("안녕하세요. %s님 ^^", name)
 				channel.Talk(text)
+				channel.Op(name)
 			}
-			request := fmt.Sprintf("MODE %s +o %s", channel.channel, name)
-			ircbot.tpWriter.PrintfLine(request)
 		} else {
 			fmt.Printf(">>> %s\n", line)
 		}
