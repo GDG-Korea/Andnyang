@@ -26,7 +26,7 @@ func NewBot() *Bot {
 	return &Bot{
 		server: "irc.ozinger.org",
 		port:   "6668",
-		nick:   "안드냥2",
+		nick:   "안드냥",
 		pass:   "",
 		conn:   nil,
 		user:   "gdgand",
@@ -84,23 +84,35 @@ func main() {
 			break
 		}
 
-		arr := ParseLine(line)
+		arr := TokenizeLine(line)
 
 		if arr[0] == "PING" {
 			token := arr[1]
 			request := fmt.Sprintf("PONG %s", token)
 			ircbot.tpWriter.PrintfLine(request)
-		} else if arr[0][0] == ':' && arr[1] == "001" {
+			continue
+		} else if arr[0][0] != ':' {
+			fmt.Printf("Something is wrong!\n")
+			fmt.Printf(">>> %s\n", line)
+			continue
+		}
+
+		systemMessageNo := arr[1]
+		if systemMessageNo == "001" {
 			request := fmt.Sprintf("JOIN %s", channel.channel)
 			ircbot.tpWriter.PrintfLine(request)
-		} else if arr[0][0] == ':' && arr[1] == "PRIVMSG" && arr[2] == channel.channel && arr[3][1] == '!' {
+			continue
+		}
+
+		command := arr[1]
+		whoLine := arr[0][1:]
+		whoArr := strings.Split(whoLine, "!")
+		name := whoArr[0]
+		if command == "PRIVMSG" && arr[2] == channel.channel && arr[3][1] == '!' {
 			fmt.Printf(">>> %s\n", line)
 			channel.Talk(arr[3][2:])
-		} else if arr[0][0] == ':' && arr[1] == "JOIN" && arr[2][1:] == channel.channel {
+		} else if command == "JOIN" && arr[2][1:] == channel.channel {
 			fmt.Printf(">>> %s\n", line)
-			nameLine := arr[0][1:]
-			nameArr := strings.Split(nameLine, "!")
-			name := nameArr[0]
 			if name == ircbot.nick {
 				channel.Talk("오랜만이에요. :) 모두 안녕하세요.")
 			} else {
@@ -115,7 +127,7 @@ func main() {
 	}
 }
 
-func ParseLine(line string) []string {
+func TokenizeLine(line string) []string {
 	output := make([]string, 4)
 	oi := 0
 	n := 0
