@@ -86,6 +86,7 @@ func main() {
 
 		arr := TokenizeLine(line)
 
+		// Each line is started with ':' except 'PING' messages.
 		if arr[0] == "PING" {
 			token := arr[1]
 			request := fmt.Sprintf("PONG %s", token)
@@ -97,6 +98,7 @@ func main() {
 			continue
 		}
 
+		// We will send join message after we will get the first notification.
 		systemMessageNo := arr[1]
 		if systemMessageNo == "001" {
 			request := fmt.Sprintf("JOIN %s", channel.channel)
@@ -105,9 +107,7 @@ func main() {
 		}
 
 		command := arr[1]
-		whoLine := arr[0][1:]
-		whoArr := strings.Split(whoLine, "!")
-		name := whoArr[0]
+		name := strings.Split(arr[0][1:], "!")[0]
 		if command == "PRIVMSG" && arr[2] == channel.channel && arr[3][1] == '!' {
 			fmt.Printf(">>> %s\n", line)
 			channel.Talk(arr[3][2:])
@@ -128,6 +128,10 @@ func main() {
 }
 
 func TokenizeLine(line string) []string {
+	// The line will break into four strings.
+	// First three strings will be splitted by whitespace,
+	// all rest characters will be the fourth string.
+
 	output := make([]string, 4)
 	oi := 0
 	n := 0
