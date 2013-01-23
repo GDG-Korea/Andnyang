@@ -96,7 +96,7 @@ func main() {
 			continue
 		}
 
-		// We will send join message after we will get the first notification.
+		// We will send join message after we will get the first notification. Otherwise, the message we sent are not processed by the server.
 		systemMessageNo := arr[1]
 		if systemMessageNo == "001" {
 			request := fmt.Sprintf("JOIN %s", channel.channel)
@@ -126,9 +126,7 @@ func main() {
 }
 
 func TokenizeLine(line string) []string {
-	// Each line will break into four strings.
-	// First three strings will be splitted by whitespace,
-	// all rest will be the fourth string.
+	// Each line will break into four strings. First three strings will be splitted by whitespace, all rest will be the fourth string.
 
 	output := make([]string, 4)
 	oi := 0
