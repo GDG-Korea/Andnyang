@@ -16,8 +16,6 @@ type Bot struct {
 	user     string
 	pass     string
 	conn     net.Conn
-	reader   *bufio.Reader
-	writer   *bufio.Writer
 	tpReader *textproto.Reader
 	tpWriter *textproto.Writer
 }
@@ -41,10 +39,10 @@ func (bot *Bot) Connect() {
 	bot.conn = conn
 
 	log.Printf("Connected to IRC server %s(%s)\n", bot.server, bot.conn.RemoteAddr())
-	bot.reader = bufio.NewReader(bot.conn)
-	bot.tpReader = textproto.NewReader(bot.reader)
-	bot.writer = bufio.NewWriter(bot.conn)
-	bot.tpWriter = textproto.NewWriter(bot.writer)
+	reader := bufio.NewReader(bot.conn)
+	writer := bufio.NewWriter(bot.conn)
+	bot.tpReader = textproto.NewReader(reader)
+	bot.tpWriter = textproto.NewWriter(writer)
 
 	userCommand := fmt.Sprintf("USER %s 8 * :%s\n", bot.user, bot.user)
 	bot.tpWriter.PrintfLine(userCommand)
