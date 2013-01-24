@@ -1,23 +1,19 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
-	"net"
 	"net/textproto"
 	"strings"
 )
 
 type Bot struct {
-	server   string
-	port     string
-	nick     string
-	user     string
-	pass     string
-	conn     net.Conn
-	tpReader *textproto.Reader
-	tpWriter *textproto.Writer
+	server string
+	port   string
+	nick   string
+	user   string
+	pass   string
+	conn   *textproto.Conn
 }
 
 func NewBot() *Bot {
@@ -32,26 +28,21 @@ func NewBot() *Bot {
 }
 
 func (bot *Bot) Connect() {
-	conn, err := net.Dial("tcp", bot.server+":"+bot.port)
+	conn, err := textproto.Dial("tcp", bot.server+":"+bot.port)
 	if err != nil {
 		log.Fatal("unable to connect to IRC server", err)
 	}
 	bot.conn = conn
-
-	log.Printf("Connected to IRC server %s(%s)\n", bot.server, bot.conn.RemoteAddr())
-	reader := bufio.NewReader(bot.conn)
-	writer := bufio.NewWriter(bot.conn)
-	bot.tpReader = textproto.NewReader(reader)
-	bot.tpWriter = textproto.NewWriter(writer)
+	log.Printf("Connected to IRC server %s:%s\n", bot.server, bot.port)
 
 	userCommand := fmt.Sprintf("USER %s 8 * :%s\n", bot.user, bot.user)
-	bot.tpWriter.PrintfLine(userCommand)
-	bot.tpWriter.PrintfLine("NICK " + bot.nick)
+	bot.conn.PrintfLine(userCommand)
+	bot.conn.PrintfLine("NICK " + bot.nick)
 }
 
 func (bot *Bot) Pong(token string) {
 	request := fmt.Sprintf("PONG %s", token)
-	bot.tpWriter.PrintfLine(request)
+	bot.conn.PrintfLine(request)
 }
 
 func (bot *Bot) Close() {
@@ -72,12 +63,12 @@ func (b *Bot) NewChannel(channel string) *Channel {
 
 func (c *Channel) Talk(msg string) {
 	text := fmt.Sprintf("PRIVMSG %s :%s", c.channel, msg)
-	c.bot.tpWriter.PrintfLine(text)
+	c.bot.conn.PrintfLine(text)
 }
 
 func (c *Channel) Op(user string) {
 	request := fmt.Sprintf("MODE %s +o %s", c.channel, user)
-	c.bot.tpWriter.PrintfLine(request)
+	c.bot.conn.PrintfLine(request)
 }
 
 func main() {
@@ -87,7 +78,7 @@ func main() {
 	channel := ircbot.NewChannel("#gdgand")
 
 	for {
-		line, err := ircbot.tpReader.ReadLine()
+		line, err := ircbot.conn.ReadLine()
 		if err != nil {
 			break
 		}
@@ -109,7 +100,7 @@ func main() {
 		systemMessageNo := arr[1]
 		if systemMessageNo == "001" {
 			request := fmt.Sprintf("JOIN %s", channel.channel)
-			ircbot.tpWriter.PrintfLine(request)
+			ircbot.conn.PrintfLine(request)
 			continue
 		}
 
