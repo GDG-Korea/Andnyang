@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/dalinaum/gdgevent/event"
 	"log"
 	"net/textproto"
 	"strings"
+	"time"
 )
 
 type Bot struct {
@@ -20,7 +22,7 @@ func NewBot() *Bot {
 	return &Bot{
 		server: "irc.ozinger.org",
 		port:   "6668",
-		nick:   "안드냥",
+		nick:   "안드냥_test",
 		pass:   "",
 		conn:   nil,
 		user:   "gdgand",
@@ -71,13 +73,32 @@ func (c *Channel) Op(user string) {
 	c.bot.conn.PrintfLine(request)
 }
 
+type GDGChannel struct {
+	*Channel
+	chapterId string
+}
+
+func (b *Bot) NewGDGChannel(channel, chapterId string) *GDGChannel {
+	return &GDGChannel{
+		b.NewChannel(channel),
+		chapterId,
+	}
+}
+
+func (c *GDGChannel) Activities() {
+	start := time.Unix(0, 0)
+	for _, e := range event.GetGDGEvents(c.chapterId, start, start) {
+		c.Talk(e.GetSummary())
+	}
+}
+
 func main() {
 	ircbot := NewBot()
 	ircbot.Connect()
 	defer ircbot.Close()
-	channels := [...]*Channel{
-		ircbot.NewChannel("#gdgand"),
-		ircbot.NewChannel("#gdgwomen"),
+	channels := [...]*GDGChannel{
+		ircbot.NewGDGChannel("#gdgand", "115078626730671785458"),
+		ircbot.NewGDGChannel("#gdgwomen", "108196114606467432743"),
 	}
 
 	for {
@@ -112,7 +133,9 @@ func main() {
 		command := arr[1]
 		name := strings.Split(arr[0][1:], "!")[0]
 		for _, channel := range channels {
-			if command == "PRIVMSG" && arr[2] == channel.channel && arr[3][1] == '!' {
+			if command == "PRIVMSG" && arr[2] == channel.channel && arr[3][1:] == "!action" {
+				channel.Activities()
+			} else if command == "PRIVMSG" && arr[2] == channel.channel && arr[3][1] == '!' {
 				fmt.Printf(">>> %s\n", line)
 				channel.Talk(arr[3][2:])
 			} else if command == "JOIN" && arr[2][1:] == channel.channel {
@@ -124,10 +147,9 @@ func main() {
 					channel.Talk(text)
 					channel.Op(name)
 				}
-			} else {
-				fmt.Printf(">>> %s\n", line)
 			}
 		}
+		fmt.Printf(">>> %s\n", line)
 	}
 }
 
