@@ -20,7 +20,7 @@ func NewBot() *Bot {
 	return &Bot{
 		server: "irc.ozinger.org",
 		port:   "6668",
-		nick:   "안드냥",
+		nick:   "안드냥2",
 		pass:   "",
 		conn:   nil,
 		user:   "gdgand",
@@ -75,7 +75,10 @@ func main() {
 	ircbot := NewBot()
 	ircbot.Connect()
 	defer ircbot.Close()
-	channel := ircbot.NewChannel("#gdgand")
+	channels := [...]*Channel{
+		ircbot.NewChannel("#gdgand"),
+		ircbot.NewChannel("#gdgwomen"),
+	}
 
 	for {
 		line, err := ircbot.conn.ReadLine()
@@ -99,27 +102,31 @@ func main() {
 		// We will send join message after we will get the first notification. Otherwise, the message we sent are not processed by the server.
 		systemMessageNo := arr[1]
 		if systemMessageNo == "001" {
-			request := fmt.Sprintf("JOIN %s", channel.channel)
-			ircbot.conn.PrintfLine(request)
+			for _, channel := range channels {
+				request := fmt.Sprintf("JOIN %s", channel.channel)
+				ircbot.conn.PrintfLine(request)
+			}
 			continue
 		}
 
 		command := arr[1]
 		name := strings.Split(arr[0][1:], "!")[0]
-		if command == "PRIVMSG" && arr[2] == channel.channel && arr[3][1] == '!' {
-			fmt.Printf(">>> %s\n", line)
-			channel.Talk(arr[3][2:])
-		} else if command == "JOIN" && arr[2][1:] == channel.channel {
-			fmt.Printf(">>> %s\n", line)
-			if name == ircbot.nick {
-				channel.Talk("오랜만이에요. :) 모두 안녕하세요.")
+		for _, channel := range channels {
+			if command == "PRIVMSG" && arr[2] == channel.channel && arr[3][1] == '!' {
+				fmt.Printf(">>> %s\n", line)
+				channel.Talk(arr[3][2:])
+			} else if command == "JOIN" && arr[2][1:] == channel.channel {
+				fmt.Printf(">>> %s\n", line)
+				if name == ircbot.nick {
+					channel.Talk("오랜만이에요. :) 모두 안녕하세요.")
+				} else {
+					text := fmt.Sprintf("안녕하세요. %s님 ^^", name)
+					channel.Talk(text)
+					channel.Op(name)
+				}
 			} else {
-				//text := fmt.Sprintf("안녕하세요. %s님 ^^", name)
-				//channel.Talk(text)
-				channel.Op(name)
+				fmt.Printf(">>> %s\n", line)
 			}
-		} else {
-			fmt.Printf(">>> %s\n", line)
 		}
 	}
 }
