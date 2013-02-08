@@ -22,7 +22,7 @@ func NewBot() *Bot {
 	return &Bot{
 		server: "irc.ozinger.org",
 		port:   "6668",
-		nick:   "안드냥_test",
+		nick:   "안드냥",
 		pass:   "",
 		conn:   nil,
 		user:   "gdgand",
