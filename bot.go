@@ -1,14 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	_ "github.com/bmizerany/pq"
 	"github.com/dalinaum/gdgevent/event"
 	"log"
 	"net/textproto"
 	"strings"
 	"time"
-	_ "github.com/bmizerany/pq"
-	"database/sql"
 )
 
 type Bot struct {
@@ -103,7 +103,6 @@ func (c *GDGChannel) Activities() {
 	}
 }
 
-
 func main() {
 	ircbot := NewBot()
 	ircbot.Connect()
@@ -117,7 +116,7 @@ func main() {
 	if error != nil {
 		log.Print(error)
 	}
-	
+
 	defer db.Close()
 
 	for {
