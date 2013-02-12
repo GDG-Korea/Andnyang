@@ -76,7 +76,6 @@ func (c *Channel) Op(user string) {
 }
 
 func (c *Channel) Log(db *sql.DB, nick string, message string) {
-	fmt.Print("나이스 사장님 샷!")
 	_, error := db.Exec("INSERT INTO ANDNYANG_LOG(date, channel, nick, message) VALUES (($1), ($2), ($3), ($4))", time.Now().UTC(), c.channel, nick, message)
 	if error != nil {
 		log.Print(error)
