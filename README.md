@@ -12,7 +12,7 @@ Install:
 
     sudo apt-get install postgresql
     go get github.com/dalinaum/Andnyang
-    sh $GOPATH/src/dalinaum/Andnyang/genDB.sh
+    sh <your GOPATH>/src/dalinaum/Andnyang/genDB.sh
 
 Run:
 
