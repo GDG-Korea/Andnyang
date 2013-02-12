@@ -7,6 +7,8 @@ import (
 	"net/textproto"
 	"strings"
 	"time"
+	_ "github.com/bmizerany/pq"
+	"database/sql"
 )
 
 type Bot struct {
@@ -73,6 +75,14 @@ func (c *Channel) Op(user string) {
 	c.bot.conn.PrintfLine(request)
 }
 
+func (c *Channel) Log(db *sql.DB, nick string, message string) {
+	fmt.Print("나이스 사장님 샷!")
+	_, error := db.Exec("INSERT INTO ANDNYANG_LOG(date, channel, nick, message) VALUES (($1), ($2), ($3), ($4))", time.Now().UTC(), c.channel, nick, message)
+	if error != nil {
+		log.Print(error)
+	}
+}
+
 type GDGChannel struct {
 	*Channel
 	chapterId string
@@ -93,6 +103,7 @@ func (c *GDGChannel) Activities() {
 	}
 }
 
+
 func main() {
 	ircbot := NewBot()
 	ircbot.Connect()
@@ -101,6 +112,13 @@ func main() {
 		ircbot.NewGDGChannel("#gdgand", "115078626730671785458"),
 		ircbot.NewGDGChannel("#gdgwomen", "108196114606467432743"),
 	}
+
+	db, error := sql.Open("postgres", "user=postgres password=gdg dbname=andnyang sslmode=disable")
+	if error != nil {
+		log.Print(error)
+	}
+	
+	defer db.Close()
 
 	for {
 		line, err := ircbot.conn.ReadLine()
@@ -139,6 +157,8 @@ func main() {
 			} else if command == "PRIVMSG" && arr[2] == channel.channel && arr[3][1] == '!' {
 				fmt.Printf(">>> %s\n", line)
 				channel.Talk(arr[3][2:])
+			} else if command == "PRIVMSG" && arr[2] == channel.channel {
+				channel.Log(db, name, arr[3][1:])
 			} else if command == "JOIN" && arr[2][1:] == channel.channel {
 				fmt.Printf(">>> %s\n", line)
 				if name == ircbot.nick {
