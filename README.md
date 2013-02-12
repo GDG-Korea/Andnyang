@@ -31,6 +31,10 @@ You can use `hohup` command to hide standard output.
 
     nohup Andnyang &
 
+Web log viewer:
+
+Please see [AndnyangWeb](https://github.com/dalinaum/AndnyangWeb)
+
 Authors
 -------
  * Leonardo YongUk kIm dalinaum@gmail.com
