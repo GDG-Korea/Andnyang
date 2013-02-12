@@ -21,7 +21,7 @@ If it does not exist, you should add your `GOPATH` to your `.bashrc` as follows.
     export GOPATH=~/mygo
     export PATH=$GOPATH/bin:$PATH
 
-After setting your `.bashrc`, enter `source ~/.bashrc` command into your terminal to use modified settigns.
+After setting your `.bashrc`, enter `source ~/.bashrc` command into your terminal to use modified setting.
 
 Run:
 
