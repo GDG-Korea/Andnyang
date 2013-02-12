@@ -14,7 +14,9 @@ Install:
     go get github.com/dalinaum/Andnyang
     sh <your GOPATH>/src/dalinaum/Andnyang/genDB.sh
 
-You can see your `GOPATH` by `export | grep GOPATH`. If it does not exist, you should add your `GOPATH` to your `.bashrc` as follows. After setting your `.bashrc`, enter `source ~/.bashrc` command into your terminal to use modified settigns.
+You can see your `GOPATH` by `export | grep GOPATH`.
+
+If it does not exist, you should add your `GOPATH` to your `.bashrc` as follows. After setting your `.bashrc`, enter `source ~/.bashrc` command into your terminal to use modified settigns.
 
     export GOPATH=~/mygo
     export PATH=$GOPATH/bin:$PATH
