@@ -16,10 +16,12 @@ Install:
 
 You can see your `GOPATH` by `export | grep GOPATH`.
 
-If it does not exist, you should add your `GOPATH` to your `.bashrc` as follows. After setting your `.bashrc`, enter `source ~/.bashrc` command into your terminal to use modified settigns.
+If it does not exist, you should add your `GOPATH` to your `.bashrc` as follows. 
 
     export GOPATH=~/mygo
     export PATH=$GOPATH/bin:$PATH
+
+After setting your `.bashrc`, enter `source ~/.bashrc` command into your terminal to use modified settigns.
 
 Run:
 
