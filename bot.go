@@ -88,7 +88,8 @@ func (b *Bot) NewGDGChannel(channel, chapterId string) *GDGChannel {
 func (c *GDGChannel) Activities() {
 	start := time.Unix(0, 0)
 	for _, e := range event.GetGDGEvents(c.chapterId, start, start) {
-		c.Talk(e.GetSummary())
+		event := fmt.Sprintf("[%s] %s (https://developers.google.com%s)", e.GetStart(), e.Title, e.Link)
+		c.Talk(event)
 	}
 }
 
