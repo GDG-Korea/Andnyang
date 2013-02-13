@@ -18,6 +18,7 @@ type Bot struct {
 	user   string
 	pass   string
 	conn   *textproto.Conn
+	retry  int
 }
 
 func NewBot() *Bot {
@@ -137,8 +138,15 @@ func main() {
 			continue
 		}
 
-		// We will send join message after we will get the first notification. Otherwise, the message we sent are not processed by the server.
 		systemMessageNo := arr[1]
+		if systemMessageNo == "433" {				
+			ircbot.retry++
+			modifiedNick := fmt.Sprintf("NICK %s%d", ircbot.nick, ircbot.retry)
+			ircbot.conn.PrintfLine(modifiedNick)
+			continue
+		}
+
+		// We will send join message after we will get the first notification. Otherwise, the message we sent are not processed by the server.
 		if systemMessageNo == "001" {
 			for _, channel := range channels {
 				request := fmt.Sprintf("JOIN %s", channel.channel)
