@@ -41,4 +41,5 @@ Authors
 -------
  * Leonardo YongUk kIm dalinaum@gmail.com
  * Homin Lee homin.lee@suapapa.net
+ * SeongJae Park sj38.park@gmail.com
 
