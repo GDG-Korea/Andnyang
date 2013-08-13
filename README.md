@@ -31,6 +31,10 @@ You can use `hohup` command to hide standard output.
 
     nohup Andnyang &
 
+Update:
+
+    go get -u github.com/dalinaum/Andnyang
+
 A web log viewer for Andnyang is provided at [AndnyangWeb](https://github.com/dalinaum/AndnyangWeb).
 
 Authors
