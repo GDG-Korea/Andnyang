@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/bmizerany/pq"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/dalinaum/gdgevent/event"
 	"log"
 	"net/textproto"
@@ -77,7 +77,8 @@ func (c *Channel) Op(user string) {
 }
 
 func (c *Channel) Log(db *sql.DB, nick string, message string) {
-	_, error := db.Exec("INSERT INTO ANDNYANG_LOG(date, channel, nick, message) VALUES (($1), ($2), ($3), ($4))", time.Now().UTC(), c.channel, nick, message)
+        request := fmt.Sprintf("INSERT INTO andnyang_log(date, channel, nick, message) VALUES ('%s', '%s', '%s', '%s')", time.Now().UTC(), c.channel, nick, message) 
+	_, error := db.Exec(request)
 	if error != nil {
 		log.Print(error)
 	}
@@ -112,7 +113,7 @@ func main() {
 		ircbot.NewGDGChannel("#gdgwomen", "108196114606467432743"),
 	}
 
-	db, error := sql.Open("postgres", "user=postgres password=gdg dbname=andnyang sslmode=disable")
+	db, error := sql.Open("mysql", "gdg:gdg@tcp(173.194.105.240:3306)/andnyang")
 	if error != nil {
 		log.Print(error)
 	}
